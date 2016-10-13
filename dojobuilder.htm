@@ -85,8 +85,8 @@ var rooms = {
 		image: 'Lab_Chem.png',
 		label: 'Lab_Chem',
 		height: 200,
-		width: -2,
-		capacity: 100,
+		width: 200,
+		capacity: -2,
 		energy: -5
 	},
 	Lab_Energy: {
@@ -335,7 +335,7 @@ canvas.on('mouse:down', function (options) {
 		options.target.scale(.25);
 	}
 
-	if (options.target === slider) {
+	if (options.target.get('id') === 'slider') {
 		oldTop = slider.top;
 	}
 });
@@ -381,11 +381,11 @@ canvas.on('mouse:up', function (options) {
 
 	if (options.target.hasOwnProperty('movesSlider')) {
 		if (options.target.movesSlider > 0 && slider.top > 25) {
-			slide(25 * (totalHeights - canvas.height) / (canvas.height - 125));
+			slide(25 * (totalHeight - canvas.height) / (canvas.height - 125));
 			slider.setTop(slider.top - 25).setCoords();
 		}
 		if (options.target.movesSlider < 0 && slider.top < canvas.height - 100) {
-			slide(-25 * (totalHeights - canvas.height) / (canvas.height - 125));
+			slide(-25 * (totalHeight - canvas.height) / (canvas.height - 125));
 			slider.setTop(slider.top + 25).setCoords();
 		}
 	}
@@ -404,7 +404,7 @@ canvas.on('object:moving', function (options) {
 
 	options.target.setCoords();
 
-	if (options.target == slider) {
+	if (options.target.get('id') === 'slider') {
 		if (slider.top < 25) {
 			slider.setTop(25).setCoords();
 		}
@@ -412,7 +412,9 @@ canvas.on('object:moving', function (options) {
 			slider.setTop(canvas.height - 100).setCoords();
 		}
 		slider.setCoords();
-		slide((oldTop - slider.top) * (totalHeights - canvas.height) / (canvas.height - 125));
+
+		var amount = (oldTop - slider.top) * (totalHeight - canvas.height) / (canvas.height - 125);//125 = 25+25+75 i.e. rect x2 + slider
+		slide(amount);
 		oldTop = slider.top;
 		slider.setCoords();
 	} else {
@@ -489,11 +491,9 @@ function check(e) {
 // slide objects
 //////////////////////////
 function slide(amount) {
-	debugText.text = '=TOP= ('+amount+'): ';
 	canvas.forEachObject(function (obj) {
 		if (!obj.template) return;
 		obj.setTop(obj.top + amount).setCoords();
-		debugText.text += obj.name + ': ' + obj.top + '; ';
 	});
 	canvas.renderAll();
 }
@@ -581,7 +581,10 @@ function reset() {
 	canvas.deactivateAll();
 	resetBtn.disabled = true;
 	canvas.clear();
+	canvas.backgroundColor = 'rgb(230,230,230)';
+    canvas.selection = false;
 	init();
+	slide(0);
 }
 
 //////////////////////////
@@ -592,11 +595,28 @@ function init() {
 
 	var i = 0;
 	var heights = 0;
-    totalEnergy = 0;
-    totalCapacity = 0;
+	totalEnergy = 0;
+	totalCapacity = 0;
+
+	// debug only
+	debugText = new fabric.Text('debug info', {
+		id: 'debugText',
+		left: panelWidth,
+		top: 55,
+		selectable: false,
+		doesNotDelete: true,
+		textAlign: 'left',
+		fontFamily: 'calibri',
+		fontSize: 14,
+		evented: false,
+		originX: 'left'
+	});
+	canvas.add(debugText);
+
 	for (var room_id in rooms) {
-        fabric.Image.fromURL('./images/' + rooms[room_id]['image'], function (oImg) {
-           // oImg.scale(0.25);
+
+		fabric.Image.fromURL('./images/' + rooms[room_id]['image'], function (oImg) {
+			// oImg.scale(0.25);
 			oImg.scaleToWidth(panelWidth - 25);
 			oImg.left = 25;
 			oImg.lockScalingX = true;
@@ -605,22 +625,20 @@ function init() {
 			oImg.set('isTrash', false);
 			oImg.set('drains', false);
 			canvas.add(oImg);
-        }, {
-            energy: rooms[room_id]['energy'],
-            capacity: rooms[room_id]['capacity'],
-            //top: templateTops[i],
+		}, {
+			energy: rooms[room_id]['energy'],
+			capacity: rooms[room_id]['capacity'],
 			top: heights,
-            name: rooms[room_id]['label'] + ' (Capacity: ' + rooms[room_id]['capacity'] + ', Energy: ' + rooms[room_id]['energy'] + ')',
-            crossOrigin: 'anonymous',
-            generalIndex: i,
-            selectable: false
-        });
+			name: rooms[room_id]['label'],// + ' (Capacity: ' + rooms[room_id]['capacity'] + ', Energy: ' + rooms[room_id]['energy'] + ')',
+			crossOrigin: 'anonymous',
+			generalIndex: i,
+			selectable: false
+		});
 
 		heights += ((panelWidth - 25) / rooms[room_id]['width']) * rooms[room_id]['height'];
-
-        i++;
+		i++;
 	}
-	totalHeights = heights;
+	totalHeight = heights;
 
 	canvas.add(new fabric.Rect({
 		width: 25,
@@ -646,6 +664,7 @@ function init() {
 	}));
 
 	slider = new fabric.Rect({
+		id: 'slider',
 		width: 25,
 		height: 75,
 		left: 0,
@@ -671,21 +690,6 @@ function init() {
 		originX: 'left'
 	});
 	canvas.add(text);
-
-	// debug only
-	debugText = new fabric.Text('debug info', {
-		id: 'debugText',
-		left: panelWidth,
-		top: canvas.height - 110,
-		selectable: false,
-		doesNotDelete: true,
-		textAlign: 'left',
-		fontFamily: 'calibri',
-		fontSize: 14,
-		evented: false,
-		originX: 'left'
-	});
-	canvas.add(debugText);
 
 	toolTip = new fabric.Text(' ', {
 		id: 'toolTip',
