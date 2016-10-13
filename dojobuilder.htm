@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<style>
+canvas {
+    border: 1px solid #000;
+	display : block;
+    margin : auto;
+}
+</style>
+<script src="fabric.min.js"></script>
+</head>
+<body oncontextmenu="return false;">
+<input id="test1-button" value="test1" type="button">
+<input id="test2-button" value="test2" type="button">
+<input id="reset-button" value="Reset" type="button">
+<input id="save-button" value="Save" type="button">Dojo Builder
+<div class="canvas-container" style="width: 100%; height: 100%; position: relative; -moz-user-select: none;"><canvas id="c" width="100%" height="100%" class="lower-canvas" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; -moz-user-select: none;"></canvas></div>
+<script defer="defer">
+var canvas = new fabric.Canvas('c', {
+	backgroundColor: 'rgb(230,230,230)',
+    selection: false
+});
+
+var grid = 25;
+var panelWidth = 150;
+
+var text;
+var debugText;
+var toolTip;
+var slider;
+var oldTop;
+var totalEnergy = 0;
+var totalCapacity = 0;
+var totalHeight;
+
+canvas.setWidth(window.innerWidth - 50);
+canvas.setHeight(window.innerHeight - 50);
+window.addEventListener('keydown', this.check, false);
+fabric.Object.prototype.setControlsVisibility({bl: false, br: false, tl: false, tr: false, mt:false, mb: false, ml:false, mr:false});
+fabric.Object.prototype.borderOpacityWhenMoving = 1;
+
+var rooms = {
+	Clan_Hall: {
+		image: 'Clan_Hall.png',
+		label: 'Clan Hall',
+		height: 400,
+		width: 200,
+		capacity: 100,
+		energy: 5
+	},
+	Clan_Great_Hall: {
+		image: 'Clan_Great_Hall.png',
+		label: 'Clan Great Hall',
+		height: 400,
+		width: 200,
+		capacity: 200,
+		energy: -2
+	},
+	Clan_Greater_Hall: {
+		image: 'Clan_Greater_Hall.png',
+		label: 'Clan_Greater_Hall',
+		height: 400,
+		width: 400,
+		capacity: 200,
+		energy: -2
+	},
+	Clan_Grand_Hall: {
+		image: 'Clan_Grand_Hall.png',
+		label: 'Clan_Grand_Hall',
+		height: 400,
+		width: 400,
+		capacity: 200,
+		energy: -2
+	},
+	Clan_Grandest_Hall: {
+		image: 'Clan_Grandest_Hall.png',
+		label: 'Clan_Grandest_Hall',
+		height: 400,
+		width: 400,
+		capacity: 200,
+		energy: -2
+	},
+	Lab_Chem: {
+		image: 'Lab_Chem.png',
+		label: 'Lab_Chem',
+		height: 200,
+		width: -2,
+		capacity: 100,
+		energy: -5
+	},
+	Lab_Energy: {
+		image: 'Lab_Energy.png',
+		label: 'Lab_Energy',
+		height: 200,
+		width: 200,
+		capacity: -2,
+		energy: -5
+	},
+	Lab_Bio: {
+		image: 'Lab_Bio.png',
+		label: 'Lab_Bio',
+		height: 200,
+		width: 200,
+		capacity: -2,
+		energy: -5
+	},
+	Lab_Tenno: {
+		image: 'Lab_Tenno.png',
+		label: 'Lab_Tenno',
+		height: 100,
+		width: 200,
+		capacity: -2,
+		energy: -5
+	},
+	Lab_Orokin: {
+		image: 'Lab_Orokin.png',
+		label: 'Lab_Orokin',
+		height: 300,
+		width: 200,
+		capacity: -2,
+		energy: -5
+	},
+	Connector_Cross: {
+		image: 'Connector_Cross.png',
+		label: 'Connector_Cross',
+		height: 200,
+		width: 200,
+		capacity: -10,
+		energy: -3
+	},
+	Connector_Elbow: {
+		image: 'Connector_Elbow.png',
+		label: 'Connector_Elbow',
+		height: 200,
+		width: 200,
+		capacity: -1,
+		energy: -1
+	},
+	Connector_Straight_Hallway: {
+		image: 'Connector_Straight_Hallway.png',
+		label: 'Connector_Straight_Hallway',
+		height: 100,
+		width: 200,
+		capacity: -1,
+		energy: -1
+	},
+	Connector_Extended_Hallway: {
+		image: 'Connector_Extended_Hallway.png',
+		label: 'Connector_Extended_Hallway',
+		height: 200,
+		width: 200,
+		capacity: -2,
+		energy: -2
+	},
+	Connector_T: {
+		image: 'Connector_T.png',
+		label: 'Connector_T',
+		height: 200,
+		width: 200,
+		capacity: -5,
+		energy: -2
+	},
+	Elevator: {
+		image: 'Elevator.png',
+		label: 'Elevator',
+		height: 200,
+		width: 200,
+		capacity: -2,
+		energy: -2
+	},
+	Barracks: {
+		image: 'Barracks.png',
+		label: 'Barracks',
+		height: 200,
+		width: 200,
+		capacity: -1,
+		energy: -1
+	},
+	Oracle: {
+		image: 'Oracle.png',
+		label: 'Oracle',
+		height: 200,
+		width: 200,
+		capacity: -2,
+		energy: -5
+	},
+	Reactor: {
+		image: 'Reactor.png',
+		label: 'Reactor',
+		height: 200,
+		width: 200,
+		capacity: -5,
+		energy: 25
+	},
+	Dueling_Room: {
+		image: 'Dueling_Room.png',
+		label: 'Dueling_Room',
+		height: 200,
+		width: 200,
+		capacity: -10,
+		energy: -10
+	},
+	Obstacle_Course: {
+		image: 'Obstacle_Course.png',
+		label: 'Obstacle_Course',
+		height: 1200,
+		width: 1000,
+		capacity: -10,
+		energy: -10
+	},
+	Garden: {
+		image: 'Garden.png',
+		label: 'Garden',
+		height: 200,
+		width: 200,
+		capacity: -10,
+		energy: -6
+	},
+	Garden_Large: {
+		image: 'Garden_Large.png',
+		label: 'Garden_Large',
+		height: 400,
+		width: 400,
+		capacity: -15,
+		energy: -8
+	},
+	Temple_Of_Honor: {
+		image: 'Temple_Of_Honor.png',
+		label: 'Temple_Of_Honor',
+		height: 400,
+		width: 400,
+		capacity: -2,
+		energy: -5
+	},
+	Observatory: {
+		image: 'Observatory.png',
+		label: 'Observatory',
+		height: 1000,
+		width: 600,
+		capacity: -2,
+		energy: -5
+	},
+};
+
+//////////////////////////
+// reset button
+//////////////////////////
+var resetBtn = document.getElementById('reset-button');
+resetBtn.addEventListener('click', function () {
+    reset();
+});
+
+//////////////////////////
+// save button
+//////////////////////////
+var saveBtn = document.getElementById('save-button');
+saveBtn.addEventListener('click', function () {
+    rasterize();
+});
+
+//////////////////////////
+// test1 button
+//////////////////////////
+var test1Btn = document.getElementById('test1-button');
+test1Btn.addEventListener('click', function () {
+
+	fabric.Image.fromURL('./images/' + rooms['clan_hall']['image'], function (oImg) {
+		oImg.scale(0.25);
+		oImg.id = 'testImg';
+// 		oImg.scaleToWidth(panelWidth - 25);
+		oImg.left = 300;
+		oImg.top = 100;
+// 		oImg.selectable = false;
+		oImg.crossOrigin = 'anonymous';
+		oImg.lockScalingX = true;
+		oImg.lockScalingY = true;
+		oImg.set('template', false);
+		oImg.set('isTrash', false);
+		oImg.set('drains', false);
+// 		oImg.setOpacity(0.5);
+		canvas.add(oImg);
+	});
+
+    canvas.forEachObject(function (obj) {
+		if (obj.id && obj.get('id') === toolTip.get('id')) {
+			debugText.text += '('+obj.get('id')+'/'+toolTip.get('id')+')';
+			obj.setOpacity(0.5);
+		}
+		if (obj.id && obj.get('id') === 'testImg') {
+			debugText.text += '('+obj.get('id')+'/'+'testImg'+')';
+			obj.setOpacity(0.5);
+			obj.scale(0.5);
+		}
+	});
+	canvas.renderAll();
+});
+
+//////////////////////////
+// test2 button
+//////////////////////////
+var test2Btn = document.getElementById('test2-button');
+test2Btn.addEventListener('click', function () {
+//     canvas.forEachObject(function (obj) {
+// 		if (obj.id && obj.get('id') === toolTip.get('id')) {
+// 			debugText.text += '('+obj.get('id')+'/'+toolTip.get('id')+')';
+// 			obj.setOpacity(1);
+// 		}
+// 	});
+	canvas.renderAll();
+});
+
+//////////////////////////
+// on mouse over
+//////////////////////////
+canvas.on('mouse:over', function (options) {
+	if (options.target.hasOwnProperty('name')) {
+		toolTip.text = options.target.name;
+		canvas.renderAll();
+	}
+});
+
+//////////////////////////
+// on mouse down
+//////////////////////////
+canvas.on('mouse:down', function (options) {
+	if (!options.target) return;
+	if (options.target.get('template')) {
+// 		copy();
+// 		paste();
+		cloneObjects();
+		options.target.set({
+			template: false
+		});
+		options.target.scale(.25);
+	}
+
+	if (options.target === slider) {
+		oldTop = slider.top;
+	}
+});
+
+//////////////////////////
+// on mouse up
+//////////////////////////
+canvas.on('mouse:up', function (options) {
+	if (!options.target) return;
+	if (options.target.hasOwnProperty('drains')) {
+		options.target.set('drains', true);
+	}
+
+	canvas.forEachObject(function (obj) {
+		if (
+			obj
+			&& (
+				obj.left < panelWidth
+				|| obj.top < -(obj.getBoundingRectHeight() / 2)
+				|| obj.top > canvas.height - (obj.getBoundingRectHeight() / 2)
+				|| obj.left + (obj.getBoundingRectWidth() / 2) > canvas.width
+				|| obj.intersectsWithRect(new fabric.Point(canvas.width - 40, canvas.height - 40), new fabric.Point(canvas.width, canvas.height))
+			)
+			&& obj.target != slider 
+			&& !obj.template 
+			&& !obj.hasOwnProperty('doesNotDelete')
+		) {
+			canvas.remove(obj);
+		}
+	});
+
+	totalCapacity = 0;
+	totalEnergy = 0;
+	canvas.forEachObject(function (obj) {
+		if (obj.drains && !obj.template) {
+			totalCapacity += obj.capacity;
+			totalEnergy += obj.energy;
+		}
+	});
+
+	text.text = 'Capacity: ' + totalCapacity + ' Energy: ' + totalEnergy;
+	canvas.renderAll();
+
+	if (options.target.hasOwnProperty('movesSlider')) {
+		if (options.target.movesSlider > 0 && slider.top > 25) {
+			slide(25 * (totalHeights - canvas.height) / (canvas.height - 125));
+			slider.setTop(slider.top - 25).setCoords();
+		}
+		if (options.target.movesSlider < 0 && slider.top < canvas.height - 100) {
+			slide(-25 * (totalHeights - canvas.height) / (canvas.height - 125));
+			slider.setTop(slider.top + 25).setCoords();
+		}
+	}
+	canvas.renderAll();
+});
+
+//////////////////////////
+// move object
+//////////////////////////
+canvas.on('object:moving', function (options) {
+	options.target.set({
+		left: Math.round(options.target.left / grid) * grid,
+		top: Math.round(options.target.top / grid) * grid,
+		template: false
+	});
+
+	options.target.setCoords();
+
+	if (options.target == slider) {
+		if (slider.top < 25) {
+			slider.setTop(25).setCoords();
+		}
+		if (slider.top > canvas.height - 100) {
+			slider.setTop(canvas.height - 100).setCoords();
+		}
+		slider.setCoords();
+		slide((oldTop - slider.top) * (totalHeights - canvas.height) / (canvas.height - 125));
+		oldTop = slider.top;
+		slider.setCoords();
+	} else {
+		options.target.setOpacity(
+		(
+		options.target.left < panelWidth
+		|| options.target.top < -(options.target.getBoundingRectHeight() / 2)
+		|| options.target.top > canvas.height - (options.target.getBoundingRectHeight() / 2)
+		|| options.target.left + (options.target.getBoundingRectWidth() / 2) > canvas.width
+		|| options.target.intersectsWithRect(new fabric.Point(canvas.width - 40, canvas.height - 40), new fabric.Point(canvas.width, canvas.height))
+		) ? 0.3 : 1);
+		canvas.renderAll();
+	}
+});
+
+//////////////////////////
+// rotate object
+//////////////////////////
+canvas.on('object:rotating', function (options) {
+	options.target.set({
+		angle: Math.round(options.target.angle / 90) * 90,
+	});
+	options.target.setCoords();
+});
+
+//////////////////////////
+// clone objects
+//////////////////////////
+function cloneObjects() {
+// 	if (canvas.getActiveGroup()) {
+// 		debugText.text = 'cloneObjects: ';
+// 		for (var i in canvas.getActiveGroup().objects) {
+// 			var object = fabric.util.object.clone(canvas.getActiveGroup().objects[i]);
+// 			object.set("top", object.top);
+// 			object.set("left", object.left);
+// 			object.set("template", true);
+// 			canvas.add(object);
+// 			debugText.text += object.name + '; ';
+// 		}
+// 	} else
+	if (canvas.getActiveObject()) {
+		debugText.text = 'cloneObject: ';
+		var object = fabric.util.object.clone(canvas.getActiveObject());
+		object.set("top", object.top);
+		object.set("left", object.left);
+		object.set("template", true);
+		canvas.add(object);
+		debugText.text += object.name + '; ';
+	}
+}
+
+//////////////////////////
+// check
+//////////////////////////
+function check(e) {
+	if (e.keyCode === 46 && canvas.getActiveObject()) {
+		canvas.remove(canvas.getActiveObject());
+
+		totalCapacity = 0;
+		totalEnergy = 0;
+		canvas.forEachObject(function (obj) {
+			if (obj.drains && !obj.template) {
+				totalCapacity += obj.capacity;
+				totalEnergy += obj.energy;
+			}
+		});
+
+		text.text = 'Capacity: ' + totalCapacity + ' Energy: ' + totalEnergy;
+		canvas.renderAll();
+	}
+}
+
+//////////////////////////
+// slide objects
+//////////////////////////
+function slide(amount) {
+	debugText.text = '=TOP= ('+amount+'): ';
+	canvas.forEachObject(function (obj) {
+		if (!obj.template) return;
+		obj.setTop(obj.top + amount).setCoords();
+		debugText.text += obj.name + ': ' + obj.top + '; ';
+	});
+	canvas.renderAll();
+}
+
+//////////////////////////
+// drawGrid();
+//////////////////////////
+function drawGrid() {
+
+    // draw panel
+    for (var i = 0; i < (canvas.height / grid); i++) {
+        canvas.add(new fabric.Line([panelWidth, i * grid, canvas.width, i * grid], {
+            stroke: '#ccc',
+            selectable: false,
+            evented: false,
+			doesNotDelete: true,
+            isTrash: false
+        }));
+    }
+
+	// draw grid area
+    for (var i = 0; i < (canvas.width / grid); i++) {
+        canvas.add(new fabric.Line([i * grid + panelWidth, 0, i * grid + panelWidth, canvas.height], {
+            stroke: i == 0 ? '#000' : '#ccc',
+            strokeWidth: i == 0 ? 2 : 1,
+            selectable: false,
+            evented: false,
+			doesNotDelete: true,
+            isTrash: false
+        }));
+    }
+}
+
+//////////////////////////
+// save picture
+//////////////////////////
+function rasterize() {
+	if (!fabric.Canvas.supports('toDataURL')) {
+		alert('This browser doesn\'t provide means to serialize canvas to an image');
+	} else {
+		canvas.deactivateAll();
+
+		var toolTipText;
+		canvas.forEachObject(function (obj) {
+			if (obj.isTrash || obj.template) {
+				obj.setOpacity(0);
+			} else if (obj.id && obj.get('id') === toolTip.get('id')) {
+				toolTipText = toolTip.get('text');
+				toolTip.text = '';
+			}
+		});
+
+		var dataUrl = canvas.toDataURL();
+		var tmpImage = new Image();
+		tmpImage.src = dataUrl;
+
+		tmpImage.onload = function(){
+			var canvas1=document.createElement('canvas');
+			var ctx1=canvas1.getContext('2d');
+			var cropWidth = canvas.getWidth() - panelWidth;
+			var cropHeight = canvas.getHeight();
+
+			canvas1.width = cropWidth;
+			canvas1.height = cropHeight;
+			ctx1.drawImage(tmpImage,panelWidth,0,cropWidth,cropHeight,0,0,cropWidth,cropHeight);
+
+			window.open(canvas1.toDataURL({format: 'png'}));
+		};
+
+		toolTip.text = toolTipText;
+
+		canvas.forEachObject(function (obj) {
+			if (obj.isTrash || obj.template) {
+				obj.setOpacity(1);
+			}
+		});
+		canvas.renderAll();
+	}
+}
+
+//////////////////////////
+// reset
+//////////////////////////
+function reset() {
+	canvas.deactivateAll();
+	resetBtn.disabled = true;
+	canvas.clear();
+	init();
+}
+
+//////////////////////////
+// init
+//////////////////////////
+function init() {
+	drawGrid();
+
+	var i = 0;
+	var heights = 0;
+    totalEnergy = 0;
+    totalCapacity = 0;
+	for (var room_id in rooms) {
+        fabric.Image.fromURL('./images/' + rooms[room_id]['image'], function (oImg) {
+           // oImg.scale(0.25);
+			oImg.scaleToWidth(panelWidth - 25);
+			oImg.left = 25;
+			oImg.lockScalingX = true;
+			oImg.lockScalingY = true;
+			oImg.set('template', true);
+			oImg.set('isTrash', false);
+			oImg.set('drains', false);
+			canvas.add(oImg);
+        }, {
+            energy: rooms[room_id]['energy'],
+            capacity: rooms[room_id]['capacity'],
+            //top: templateTops[i],
+			top: heights,
+            name: rooms[room_id]['label'] + ' (Capacity: ' + rooms[room_id]['capacity'] + ', Energy: ' + rooms[room_id]['energy'] + ')',
+            crossOrigin: 'anonymous',
+            generalIndex: i,
+            selectable: false
+        });
+
+		heights += ((panelWidth - 25) / rooms[room_id]['width']) * rooms[room_id]['height'];
+
+        i++;
+	}
+	totalHeights = heights;
+
+	canvas.add(new fabric.Rect({
+		width: 25,
+		height: 25,
+		left: 0,
+		top: 0,
+		selectable: false,
+		hasControls: false,
+		fill: '#000',
+		doesNotDelete: true,
+		movesSlider: 1
+	}));
+	canvas.add(new fabric.Rect({
+		width: 25,
+		height: 25,
+		left: 0,
+		top: canvas.height - 25,
+		selectable: false,
+		hasControls: false,
+		fill: '#000',
+		doesNotDelete: true,
+		movesSlider: -1
+	}));
+
+	slider = new fabric.Rect({
+		width: 25,
+		height: 75,
+		left: 0,
+		top: 25,
+		hasControls: false,
+		fill: '#aaa',
+		doesNotDelete: true,
+		lockMovementX: true
+	});
+	slider.selectable = false;
+	canvas.add(slider);
+	oldTop = slider.getTop();
+
+	text = new fabric.Text('Capacity: ' + totalCapacity + ' Energy: ' + totalEnergy, {
+		id: 'text',
+		left: panelWidth,
+		top: canvas.height - 55,
+		selectable: false,
+		doesNotDelete: true,
+		textAlign: 'left',
+		fontFamily: 'calibri',
+		evented: false,
+		originX: 'left'
+	});
+	canvas.add(text);
+
+	// debug only
+	debugText = new fabric.Text('debug info', {
+		id: 'debugText',
+		left: panelWidth,
+		top: canvas.height - 110,
+		selectable: false,
+		doesNotDelete: true,
+		textAlign: 'left',
+		fontFamily: 'calibri',
+		fontSize: 14,
+		evented: false,
+		originX: 'left'
+	});
+	canvas.add(debugText);
+
+	toolTip = new fabric.Text(' ', {
+		id: 'toolTip',
+		left: panelWidth,
+		top: 0,
+		selectable: false,
+		doesNotDelete: true,
+		textAlign: 'left',
+		fontFamily: 'calibri',
+		evented: false,
+		originX: 'left'
+	});
+	canvas.add(toolTip);
+
+	fabric.Image.fromURL('./images/recycle.png', function (oImg) {
+		oImg.scale(0.5);
+		oImg.selectable = false;
+		oImg.set('isTrash', true);
+		oImg.top = canvas.height - 50;
+		oImg.left = canvas.width - 50;
+		oImg.evented = false;
+		canvas.add(oImg);
+		resetBtn.disabled = false;
+		slider.selectable = true;
+		canvas.forEachObject(function (obj) {
+			if (obj.template && obj.name) {
+				if(obj.name != ' ') {
+					obj.selectable = true;
+				}
+			}
+		});
+	}, {
+		crossOrigin: 'anonymous',
+		doesNotDelete: true
+	});
+
+    canvas.renderAll();
+}
+
+resetBtn.disabled = true;
+init();
+slide(0);
+</script>
+</body>
+</html>
