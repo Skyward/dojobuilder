@@ -3,9 +3,9 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <style>
 canvas {
-    border: 1px solid #000;
+	border: 1px solid #000;
 	display : block;
-    margin : auto;
+	margin : auto;
 }
 </style>
 <script src="fabric.min.js"></script>
@@ -19,7 +19,7 @@ canvas {
 <script defer="defer">
 var canvas = new fabric.Canvas('c', {
 	backgroundColor: 'rgb(230,230,230)',
-    selection: false
+	selection: false
 });
 
 var grid = 25;
@@ -59,7 +59,7 @@ var rooms = {
 	},
 	Clan_Greater_Hall: {
 		image: 'Clan_Greater_Hall.png',
-		label: 'Clan_Greater_Hall',
+		label: 'Clan Greater Hall',
 		height: 400,
 		width: 400,
 		capacity: 200,
@@ -67,7 +67,7 @@ var rooms = {
 	},
 	Clan_Grand_Hall: {
 		image: 'Clan_Grand_Hall.png',
-		label: 'Clan_Grand_Hall',
+		label: 'Clan Grand Hall',
 		height: 400,
 		width: 400,
 		capacity: 200,
@@ -75,7 +75,7 @@ var rooms = {
 	},
 	Clan_Grandest_Hall: {
 		image: 'Clan_Grandest_Hall.png',
-		label: 'Clan_Grandest_Hall',
+		label: 'Clan Grandest Hall',
 		height: 400,
 		width: 400,
 		capacity: 200,
@@ -83,7 +83,7 @@ var rooms = {
 	},
 	Lab_Chem: {
 		image: 'Lab_Chem.png',
-		label: 'Lab_Chem',
+		label: 'Lab Chem',
 		height: 200,
 		width: 200,
 		capacity: -2,
@@ -91,7 +91,7 @@ var rooms = {
 	},
 	Lab_Energy: {
 		image: 'Lab_Energy.png',
-		label: 'Lab_Energy',
+		label: 'Lab Energy',
 		height: 200,
 		width: 200,
 		capacity: -2,
@@ -99,7 +99,7 @@ var rooms = {
 	},
 	Lab_Bio: {
 		image: 'Lab_Bio.png',
-		label: 'Lab_Bio',
+		label: 'Lab Bio',
 		height: 200,
 		width: 200,
 		capacity: -2,
@@ -107,7 +107,7 @@ var rooms = {
 	},
 	Lab_Tenno: {
 		image: 'Lab_Tenno.png',
-		label: 'Lab_Tenno',
+		label: 'Lab Tenno',
 		height: 100,
 		width: 200,
 		capacity: -2,
@@ -115,7 +115,7 @@ var rooms = {
 	},
 	Lab_Orokin: {
 		image: 'Lab_Orokin.png',
-		label: 'Lab_Orokin',
+		label: 'Lab Orokin',
 		height: 300,
 		width: 200,
 		capacity: -2,
@@ -123,7 +123,7 @@ var rooms = {
 	},
 	Connector_Cross: {
 		image: 'Connector_Cross.png',
-		label: 'Connector_Cross',
+		label: 'Connector Cross',
 		height: 200,
 		width: 200,
 		capacity: -10,
@@ -131,7 +131,7 @@ var rooms = {
 	},
 	Connector_Elbow: {
 		image: 'Connector_Elbow.png',
-		label: 'Connector_Elbow',
+		label: 'Connector Elbow',
 		height: 200,
 		width: 200,
 		capacity: -1,
@@ -139,7 +139,7 @@ var rooms = {
 	},
 	Connector_Straight_Hallway: {
 		image: 'Connector_Straight_Hallway.png',
-		label: 'Connector_Straight_Hallway',
+		label: 'Connector Straight Hallway',
 		height: 100,
 		width: 200,
 		capacity: -1,
@@ -147,7 +147,7 @@ var rooms = {
 	},
 	Connector_Extended_Hallway: {
 		image: 'Connector_Extended_Hallway.png',
-		label: 'Connector_Extended_Hallway',
+		label: 'Connector Extended Hallway',
 		height: 200,
 		width: 200,
 		capacity: -2,
@@ -155,7 +155,7 @@ var rooms = {
 	},
 	Connector_T: {
 		image: 'Connector_T.png',
-		label: 'Connector_T',
+		label: 'Connector T',
 		height: 200,
 		width: 200,
 		capacity: -5,
@@ -195,7 +195,7 @@ var rooms = {
 	},
 	Dueling_Room: {
 		image: 'Dueling_Room.png',
-		label: 'Dueling_Room',
+		label: 'Dueling Room',
 		height: 200,
 		width: 200,
 		capacity: -10,
@@ -203,7 +203,7 @@ var rooms = {
 	},
 	Obstacle_Course: {
 		image: 'Obstacle_Course.png',
-		label: 'Obstacle_Course',
+		label: 'Obstacle Course',
 		height: 1200,
 		width: 1000,
 		capacity: -10,
@@ -219,7 +219,7 @@ var rooms = {
 	},
 	Garden_Large: {
 		image: 'Garden_Large.png',
-		label: 'Garden_Large',
+		label: 'Garden Large',
 		height: 400,
 		width: 400,
 		capacity: -15,
@@ -227,7 +227,7 @@ var rooms = {
 	},
 	Temple_Of_Honor: {
 		image: 'Temple_Of_Honor.png',
-		label: 'Temple_Of_Honor',
+		label: 'Temple Of Honor',
 		height: 400,
 		width: 400,
 		capacity: -2,
@@ -248,7 +248,7 @@ var rooms = {
 //////////////////////////
 var resetBtn = document.getElementById('reset-button');
 resetBtn.addEventListener('click', function () {
-    reset();
+	reset();
 });
 
 //////////////////////////
@@ -256,7 +256,7 @@ resetBtn.addEventListener('click', function () {
 //////////////////////////
 var saveBtn = document.getElementById('save-button');
 saveBtn.addEventListener('click', function () {
-    rasterize();
+	rasterize();
 });
 
 //////////////////////////
@@ -282,7 +282,7 @@ test1Btn.addEventListener('click', function () {
 		canvas.add(oImg);
 	});
 
-    canvas.forEachObject(function (obj) {
+	canvas.forEachObject(function (obj) {
 		if (obj.id && obj.get('id') === toolTip.get('id')) {
 			debugText.text += '('+obj.get('id')+'/'+toolTip.get('id')+')';
 			obj.setOpacity(0.5);
@@ -301,7 +301,7 @@ test1Btn.addEventListener('click', function () {
 //////////////////////////
 var test2Btn = document.getElementById('test2-button');
 test2Btn.addEventListener('click', function () {
-//     canvas.forEachObject(function (obj) {
+// 	canvas.forEachObject(function (obj) {
 // 		if (obj.id && obj.get('id') === toolTip.get('id')) {
 // 			debugText.text += '('+obj.get('id')+'/'+toolTip.get('id')+')';
 // 			obj.setOpacity(1);
@@ -503,28 +503,28 @@ function slide(amount) {
 //////////////////////////
 function drawGrid() {
 
-    // draw panel
-    for (var i = 0; i < (canvas.height / grid); i++) {
-        canvas.add(new fabric.Line([panelWidth, i * grid, canvas.width, i * grid], {
-            stroke: '#ccc',
-            selectable: false,
-            evented: false,
+	// draw panel
+	for (var i = 0; i < (canvas.height / grid); i++) {
+		canvas.add(new fabric.Line([panelWidth, i * grid, canvas.width, i * grid], {
+			stroke: '#ccc',
+			selectable: false,
+			evented: false,
 			doesNotDelete: true,
-            isTrash: false
-        }));
-    }
+			isTrash: false
+		}));
+	}
 
 	// draw grid area
-    for (var i = 0; i < (canvas.width / grid); i++) {
-        canvas.add(new fabric.Line([i * grid + panelWidth, 0, i * grid + panelWidth, canvas.height], {
-            stroke: i == 0 ? '#000' : '#ccc',
-            strokeWidth: i == 0 ? 2 : 1,
-            selectable: false,
-            evented: false,
+	for (var i = 0; i < (canvas.width / grid); i++) {
+		canvas.add(new fabric.Line([i * grid + panelWidth, 0, i * grid + panelWidth, canvas.height], {
+			stroke: i == 0 ? '#000' : '#ccc',
+			strokeWidth: i == 0 ? 2 : 1,
+			selectable: false,
+			evented: false,
 			doesNotDelete: true,
-            isTrash: false
-        }));
-    }
+			isTrash: false
+		}));
+	}
 }
 
 //////////////////////////
@@ -582,7 +582,7 @@ function reset() {
 	resetBtn.disabled = true;
 	canvas.clear();
 	canvas.backgroundColor = 'rgb(230,230,230)';
-    canvas.selection = false;
+	canvas.selection = false;
 	init();
 	slide(0);
 }
@@ -624,6 +624,7 @@ function init() {
 			oImg.set('template', true);
 			oImg.set('isTrash', false);
 			oImg.set('drains', false);
+			oImg.selectable = true;
 			canvas.add(oImg);
 		}, {
 			energy: rooms[room_id]['energy'],
@@ -674,7 +675,7 @@ function init() {
 		doesNotDelete: true,
 		lockMovementX: true
 	});
-	slider.selectable = false;
+	slider.selectable = true;
 	canvas.add(slider);
 	oldTop = slider.getTop();
 
@@ -704,32 +705,10 @@ function init() {
 	});
 	canvas.add(toolTip);
 
-	fabric.Image.fromURL('./images/recycle.png', function (oImg) {
-		oImg.scale(0.5);
-		oImg.selectable = false;
-		oImg.set('isTrash', true);
-		oImg.top = canvas.height - 50;
-		oImg.left = canvas.width - 50;
-		oImg.evented = false;
-		canvas.add(oImg);
-		resetBtn.disabled = false;
-		slider.selectable = true;
-		canvas.forEachObject(function (obj) {
-			if (obj.template && obj.name) {
-				if(obj.name != ' ') {
-					obj.selectable = true;
-				}
-			}
-		});
-	}, {
-		crossOrigin: 'anonymous',
-		doesNotDelete: true
-	});
-
-    canvas.renderAll();
+	canvas.renderAll();
 }
 
-resetBtn.disabled = true;
+resetBtn.disabled = false;
 init();
 slide(0);
 </script>
